@@ -1,0 +1,14 @@
+services:
+  backend:
+    container_name: backend_container
+    image: backend_img
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+  
+  mongodb:
+    container_name: db_container
+    image:  mongo
+    ports:
+      - 27017:27017
