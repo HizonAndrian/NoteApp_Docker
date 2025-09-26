@@ -1,14 +1,23 @@
 services:
   backend:
     container_name: backend_container
-    image: backend_img
+    build: ./backend
     ports:
       - 8000:8000
     depends_on:
       - mongodb
+    env_file:
+      - ./.env
   
   mongodb:
-    container_name: db_container
+    # container_name: db_container
     image:  mongo
     ports:
       - 27017:27017
+    env_file:
+      - ./.env
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
