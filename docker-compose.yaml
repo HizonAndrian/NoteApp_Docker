@@ -10,7 +10,6 @@ services:
       - ./.env
   
   mongodb:
-    # container_name: db_container
     image:  mongo
     ports:
       - 27017:27017

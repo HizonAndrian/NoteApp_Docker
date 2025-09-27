@@ -27,3 +27,8 @@ Pydantic → another package to handle data validation.
  - get_database() gets the database you want to work with.
  - If you pass no argument, it defaults to the database specified in the connection string (noteappdb in your case).
  - db now represents your database
+
+
+## So the rule of thumb:
+ - Root user (MONGO_INITDB_ROOT_*) → must use authSource=admin.
+ - App-specific user created in your app DB → no need for authSource, simpler URL.
