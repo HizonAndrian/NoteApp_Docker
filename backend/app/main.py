@@ -4,9 +4,10 @@ from pymongo import MongoClient
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 
+# Pydantic model for note item.
 class note_item(BaseModel):
     title: str
-    desciption: str
+    description: str
     done: bool
 
 app = FastAPI()
@@ -25,10 +26,12 @@ note_db = client.get_database()
 
 
 
-@app.post("/note")
+@app.post("/note", response_model=note_item, status_code=201)
 async def create_note(note: note_item):
-    result = note_db.notes.insert_one(note)
-    return {"inserted_id": "POST: Hello World"}
+    result = await note_db.notes.insert_one(note.model_dump())
+    created_note = note.model_dump()
+    created_note["id"] = str(result.inserted_id)
+    return created_note
 
 @app.get("/note")
 def get_note():
