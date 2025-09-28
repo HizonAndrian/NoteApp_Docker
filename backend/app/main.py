@@ -1,15 +1,21 @@
 import os
 from fastapi import FastAPI
-from pymongo import MongoClient
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import ReturnDocument
 from bson import ObjectId
 
-# Pydantic model for note item.
+# Pydantic model for creating note item.
 class note_item(BaseModel):
     title: str
     description: str
     done: bool
+
+# Pydantic model for updating note item.
+class update_item(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    done: bool | None = None
 
 app = FastAPI()
 
@@ -24,7 +30,6 @@ MONGO_URL = "mongodb://noteappadmin:noteappsecret@mongodb:27017/noteappdb?authSo
 
 client = AsyncIOMotorClient(MONGO_URL)
 note_db = client.get_database()
-
 
 
 @app.post("/note", response_model=note_item, status_code=201)
@@ -61,12 +66,38 @@ async def get_note_id(id: str):
 
 
 
-@app.put("/note")
-def update_note():
-    return {"message": "PUT: Hello World"}
+@app.put("/note/{id}")
+async def update_note(id: str, item: update_item):
+
+    # Focus on the BODY of the request.
+    # Create a dictionary to hold the fields to be updated. 
+    # Fields that are not NONE.
+    target_note = {
+        k: v # return key and value pair
+        for k, v in item.model_dump().items() #
+        if v is not None
+    }
+
+    if len(target_note) >= 1:
+        update_target = await note_db.notes.find_one_and_update(
+            {"_id": ObjectId(id)},
+            {"$set": target_note},
+            return_document=ReturnDocument.AFTER
+        )
+        if update_target is not None:
+            update_target["id"] = str(update_target["_id"])
+            update_target.pop("_id")
+            return update_target
+        else:
+            return {"error": "Note not found"}
 
 
-@app.delete("/note")
-def delete_note():
-    return {"message": "DELETE: Hello World"}
 
+@app.delete("/note/{id}")
+async def delete_note(id: str):
+
+    delete_target = await note_db.notes.delete_one({"_id": ObjectId(id)})
+    if delete_target.deleted_count == 1:
+        return {"message": "Note deleted successfully"}
+    else:
+        return {"error": "Note not found"}
