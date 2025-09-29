@@ -18,5 +18,12 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"   # frontend runs on localhost:3000
+    depends_on:
+      - backend
+
 volumes:
   mongo_data:

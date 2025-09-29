@@ -29,6 +29,6 @@ Pydantic → another package to handle data validation.
  - db now represents your database
 
 
-## So the rule of thumb:
+## Rule of thumb:
  - Root user (MONGO_INITDB_ROOT_*) → must use authSource=admin.
  - App-specific user created in your app DB → no need for authSource, simpler URL.

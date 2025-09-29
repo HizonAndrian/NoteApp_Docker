@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import ReturnDocument
 from bson import ObjectId
+from fastapi.middleware.cors import CORSMiddleware
 
 # Pydantic model for creating note item.
 class note_item(BaseModel):
@@ -19,14 +20,22 @@ class update_item(BaseModel):
 
 app = FastAPI()
 
-# MONGO_URL = f"mongodb://{os.getenv('MONGO_INITDB_ROOT_USERNAME')}:"\
-#             f"{os.getenv('MONGO_INITDB_ROOT_PASSWORD')}@"\
-#             f"{os.getenv('MONGO_HOST')}:{os.getenv('MONGO_PORT')}/"\
-#             f"{os.getenv('MONGO_INITDB_DATABASE')}"\
-#             f"?authSource=admin"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+MONGO_URL = f"mongodb://{os.getenv('MONGO_USERNAME')}:"\
+            f"{os.getenv('MONGO_PASSWORD')}@"\
+            f"{os.getenv('MONGO_HOST')}:{os.getenv('MONGO_PORT')}/"\
+            f"{os.getenv('MONGO_DB')}"\
+            f"?authSource=admin"
 
 # FULL URL:
-MONGO_URL = "mongodb://noteappadmin:noteappsecret@mongodb:27017/noteappdb?authSource=admin"
+# MONGO_URL = "mongodb://noteappadmin:noteappsecret@mongodb:27017/noteappdb?authSource=admin"
 
 client = AsyncIOMotorClient(MONGO_URL)
 note_db = client.get_database()
@@ -75,7 +84,7 @@ async def update_note(id: str, item: update_item):
     target_note = {
         k: v # return key and value pair
         for k, v in item.model_dump().items() #
-        if v is not None
+        if v not in (None, "", " ") # if value is not None or empty string
     }
 
     if len(target_note) >= 1:
