@@ -47,19 +47,6 @@ async function deleteNote(id) {
   fetchNotes();
 }
 
-// async function editNote(id) {
-//   const newTitle = prompt("Enter new title:");
-//   const newDescription = prompt("Enter new description:");
-//   const newDone = confirm("Mark as done?");
-
-//   await fetch(`${API_URL}/note/${id}`, {
-//     method: "PUT",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify({ title: newTitle, description: newDescription, done: newDone })
-//   });
-
-//   fetchNotes();
-// }
 
 async function editNote(id) {
   const newTitle = prompt("Enter new title (leave blank to keep current):");
