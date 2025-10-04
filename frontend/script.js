@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000"; // adjust for container setup
+const API_URL = "https://api.cloudriann.com"; // adjust for container setup
 const notesDiv = document.getElementById("notes");
 const noteForm = document.getElementById("noteForm");
 

@@ -40,6 +40,10 @@ MONGO_URL = f"mongodb://{os.getenv('MONGO_USERNAME')}:"\
 client = AsyncIOMotorClient(MONGO_URL)
 note_db = client.get_database()
 
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+
 
 @app.post("/note", response_model=note_item, status_code=201)
 async def create_note(note: note_item):
